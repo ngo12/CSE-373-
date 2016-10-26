@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * @author Steve Tanimoto
  *
  * The method IsPrime.isPrime(n) tests whether n is a prime number.
@@ -8,7 +8,7 @@
  */
 
 public class IsPrime {
-	
+
 	public static boolean isPrime(long n) {
 		if (n < 2) return false;
 		if(n==2 || n==3) return true;

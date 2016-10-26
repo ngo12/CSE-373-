@@ -24,13 +24,13 @@ public class FeatureVector {
 
 	/**
 	 * Constructor of a FeatureVector.
-	 * 
+	 *
 	 * This creates a FeatureVector instance with an array of the
 	 * proper size to hold a count for every possible element in the key space.
-	 * 
+	 *
 	 * @param bpp	Bits per pixel. This controls the size of the vector.
 	 * 				The keySpace Size is 2^k where k is bpp.
-	 * 
+	 *
 	 */
 	public FeatureVector(int bpp) {
 		keySpaceSize = 1 << bpp;
@@ -90,7 +90,7 @@ public class FeatureVector {
 	 * @return Returns the product of the magnitude of two vectors.
 	 */
 	private double vectorMagnitudeProduct(long[] A, long[] B){
-	   	double sumA = 0;
+		double sumA = 0;
 		double sumB = 0;
 
 		for (int i = 0; i < A.length; i++) {
@@ -109,7 +109,7 @@ public class FeatureVector {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		FeatureVector testFV = new FeatureVector(6);
-        System.out.println(testFV.keySpaceSize);
+		System.out.println(testFV.keySpaceSize);
 
 		try {
 			ColorKey black = new ColorKey(0, 0, 0, 6);

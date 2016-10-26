@@ -12,11 +12,11 @@ import javax.imageio.ImageIO;
  * called getColorKey.
  */
 public class ImageLoader {
-	
+
 	BufferedImage bi;
 	int width;
 	int height;
-	
+
 	public ImageLoader(String filename) {
 		try {
 			bi = ImageIO.read(new File(filename));
@@ -26,12 +26,12 @@ public class ImageLoader {
 			System.out.println("Image could not be read: "+filename);
 			System.exit(1);
 		}
-		
+
 	}
-	
+
 	public int getWidth() { return width; }
 	public int getHeight() { return height; }
-	
+
 	public ColorKey getColorKey(int x, int y, int bitsPerPixel) {
 		int rgb = bi.getRGB(x,  y);
 		int r = (rgb >> 16) & 255;

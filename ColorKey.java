@@ -8,7 +8,7 @@
 public class ColorKey {
 	private int bitsPerPixel;
 	private int bits;
-	
+
 /**
  * The constructor for a ColorKey object.
  * <p>
@@ -17,7 +17,7 @@ public class ColorKey {
  * by shifting them to the right some number of bit positions.
  * This cuts the number of bits per color component to a third of the bpp.
  * Then the 3 reduced color components are packed into the low-order bpp bits of "bits".
- * 
+ *
  * @param r	The red value of the input color. An int between 0 and 255.
  * @param g	The green value.
  * @param b	The blue value.
@@ -65,7 +65,7 @@ public class ColorKey {
 		return "ColorKey[bits per pixel:"+bitsPerPixel+", bits:"+bits+"]";
 	}
 /**
- * The main method is here only for testing the constructor.  It is not used in 
+ * The main method is here only for testing the constructor.  It is not used in
  * normal use of the class.
  */
 	public static void main(String[] argv) {

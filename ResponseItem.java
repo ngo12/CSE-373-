@@ -13,16 +13,16 @@
  */
 public class ResponseItem {
 	public long value; // meaningful only for get operations (colorHashGet),
-	         //where the value associated with the key is returned.
+			 //where the value associated with the key is returned.
 	public int nCollisions; // the number of collisions involved in this operation.
 	public boolean didRehash; // true if this operation caused a rehash due to either exceeding
-	         //the load factor threshold or running out of space 
+			 //the load factor threshold or running out of space
 			// (this can happen with quadratic collision resolution).
-	        // This can only happen when inserting.
+			// This can only happen when inserting.
 	public boolean didUpdate; // true if this operation caused the value associated with
-	         //an existing key to be overwritten (possibly changed but possibly
+			 //an existing key to be overwritten (possibly changed but possibly
 			//just rewritten with the same value).
-	        // If the put operation inserted a new key, then false should be returned.
+			// If the put operation inserted a new key, then false should be returned.
 
 
 	/**
