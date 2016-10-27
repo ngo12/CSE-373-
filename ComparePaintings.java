@@ -37,7 +37,12 @@ public class ComparePaintings {
 		// Construct hash table and populate it while counting total collisions
 		ResponseItem currentResponse;
 		collisionSum = 0;
-		myCH = new ColorHash(INITIAL_TABLE_SIZE, bitsPerPixel, probingMethod, REHASH_LOAD_FACTOR);
+		try{
+			myCH = new ColorHash(INITIAL_TABLE_SIZE, bitsPerPixel, probingMethod, REHASH_LOAD_FACTOR);
+		}
+		catch (Exception InvalidLoadFactor){
+			System.out.println(InvalidLoadFactor);
+		}
 		for (int x = 0; x < il.getWidth(); x++) {
 			for (int y = 0; y < il.getHeight(); y++) {
 				currentResponse = myCH.increment(il.getColorKey(x, y, bitsPerPixel));
