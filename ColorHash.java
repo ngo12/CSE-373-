@@ -7,12 +7,12 @@ public class ColorHash {
 
 	// Constants
 	static final String LINEAR_PROBING = "Linear Probing";
-	static final String QUAD_PROBING = "Quadratic Probing";
+	static final String QUAD_PROBING   = "Quadratic Probing";
 
 	// Members
-	private HashEntry[] hashTable;     // The hash table itself, made up of dictionaries {key, value}
+	private HashEntry[] hashTable;  // The hash table itself, made up of dictionaries {key, value}
 	private String collisionMethod; // Chooses which method of probing we use to handle collisions
-	private int currentSize;           // Number of elements currently in hash table
+	private int currentSize;        // Number of elements currently in hash table
 	private int bpp;                // bitsPerPixel
 	private double rhLoadFactor;    // The rehash load factor
 
@@ -31,10 +31,10 @@ public class ColorHash {
 	public ColorHash(int tableSize, int bitsPerPixel, String collisionResolutionMethod, double rehashLoadFactor) throws Exception {
 
 		// Initialize members
-		hashTable = new HashEntry[tableSize];
-		rhLoadFactor = rehashLoadFactor;
-		bpp = bitsPerPixel;
-		currentSize = 0;
+		hashTable       = new HashEntry[tableSize];
+		rhLoadFactor    = rehashLoadFactor;
+		bpp             = bitsPerPixel;
+		currentSize     = 0;
 		collisionMethod = collisionResolutionMethod;
 
 		// Check for valid resolution method
@@ -125,7 +125,7 @@ public class ColorHash {
 	 */
 	public ResponseItem colorHashPut(ColorKey key, long value){
 
-		int nCollisions = 0;
+		int nCollisions   = 0;
 		boolean didRehash = false;
 		boolean didUpdate = false;
 
@@ -162,8 +162,8 @@ public class ColorHash {
 	 */
 	public ResponseItem increment(ColorKey key){
 
-		long value = 1;
-		int nCollisions = 0;
+		long value        = 1;
+		int nCollisions   = 0;
 		boolean didRehash = false;
 		boolean didUpdate = false;
 
@@ -199,8 +199,8 @@ public class ColorHash {
 	 */
 	public ResponseItem colorHashGet(ColorKey key)  throws Exception{
 
-		long value = -1L;
-		int nCollisions = 0;
+		long value        = -1L;
+		int nCollisions   = 0;
 		boolean didRehash = false;
 		boolean didUpdate = false;
 
@@ -228,7 +228,7 @@ public class ColorHash {
 	 */
 	public long getCount(ColorKey key){
 
-		long value = -1L;
+		long value      = -1L;
 		int nCollisions = 0;
 
 		int[] ixAndCols = probing(key); // Get insert/update position and numCollisions
