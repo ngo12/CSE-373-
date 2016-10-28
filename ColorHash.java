@@ -1,6 +1,6 @@
 /**
- * TODO Describe class!!!
- * @author Ngo, Linden
+ * ColorHash is a hash table for the ColorKey object.
+ * @author Brandon Ngo, Ryan Linden
  *
  */
 public class ColorHash {
@@ -9,7 +9,7 @@ public class ColorHash {
 	static final String LINEAR_PROBING = "Linear Probing";
 	static final String QUAD_PROBING = "Quadratic Probing";
 
-	// Initialized in constructor
+	// Members
 	private HashEntry[] hashTable;     // The hash table itself, made up of dictionaries {key, value}
 	private String collisionMethod; // Chooses which method of probing we use to handle collisions
 	private int currentSize;           // Number of elements currently in hash table
@@ -35,6 +35,7 @@ public class ColorHash {
 		rhLoadFactor = rehashLoadFactor;
 		bpp = bitsPerPixel;
 		currentSize = 0;
+		collisionMethod = collisionResolutionMethod;
 
 		// Check for valid resolution method
 		if (!collisionResolutionMethod.equals(LINEAR_PROBING) && !collisionResolutionMethod.equals(QUAD_PROBING)){
@@ -51,9 +52,6 @@ public class ColorHash {
 				throw new InvalidLoadFactorException("Invalid Load Factor for Quadratic Probing");
 			}
 		}
-
-		collisionMethod = collisionResolutionMethod;
-
 	}
 
 	/**
@@ -77,6 +75,46 @@ public class ColorHash {
 		}
 	}
 
+	/**
+	 * Probes the hash table for the insert/update location of the ColorKey, counting collisions along the way.
+	 * It does linear/quadratic probing based on the constructor input.
+	 *
+	 * @param key The key to insert/update in the hash table.
+	 * @return An array of type int[size=2] where array[0] = the index of insert/update point
+	 * and array[1] = the number of collisions during the probing.
+	 */
+	private int[] probing(ColorKey key){
+
+		int nCollisions = 0;
+
+		int[] indexAndCollisions = new int[2];
+
+		int hashIndex = key.hashCode() % hashTable.length; // Get the first target index
+
+		boolean keyFound = false; // True if we found a place to insert/update
+		while (!keyFound){
+
+			HashEntry currentHash = hashTable[hashIndex];
+
+			if (currentHash == null || currentHash.myKey.equals(key)) { // Empty/duplicate spot found
+				keyFound = true;
+			} else {  // Otherwise we have a collision, and will probe for a new spot using specified collision method
+				nCollisions++;
+				if (collisionMethod.equals(LINEAR_PROBING)){
+					hashIndex++;
+					if (hashIndex == getTableSize()){hashIndex = 0;} // Wrap around array if needed
+				} else if (collisionMethod.equals(QUAD_PROBING)){
+					hashIndex = nCollisions * nCollisions + key.hashCode() % hashTable.length;
+					while(hashIndex >= getTableSize()){
+						hashIndex -= getTableSize();
+					}
+				}
+			}
+		}
+		indexAndCollisions[0] = hashIndex;
+		indexAndCollisions[1] = nCollisions;
+		return indexAndCollisions;
+	}
 
 	/**
 	 * Inserts key into hash table with associated value
@@ -91,49 +129,32 @@ public class ColorHash {
 		boolean didRehash = false;
 		boolean didUpdate = false;
 
-		int hashIndex = key.hashCode() % hashTable.length; // Get the first target index
 
-		boolean keyFound = false; // True if we found a place to insert/update
-		while (!keyFound){
+		int[] ixAndCols = probing(key); // Get insert/update position and numCollisions
+		int hashIndex = ixAndCols[0];
+		nCollisions = ixAndCols[1];
 
-			HashEntry currentHash = hashTable[hashIndex];
+		HashEntry currentHash = hashTable[hashIndex];
 
-			if (currentHash == null) { // Nothing found at target index, insert entry
-				didRehash = checkRehashing();
-				if (didRehash){
-					hashIndex = key.hashCode() % hashTable.length; // Get the first target index
-					nCollisions += resizeCollisions;
-				}
-				hashTable[hashIndex] = new HashEntry(key, value);
-				currentSize++;
-				keyFound = true;
-
-			} else if (currentHash.myKey.equals(key)) { // Duplicate key found, update value
-				hashTable[hashIndex].myValue = value;
-				didUpdate = true;
-				keyFound = true;
-
-			} else {  // Otherwise we have a collision, and will probe for a new spot using specified collision method
-				nCollisions++;
-				if (collisionMethod.equals(LINEAR_PROBING)){
-					hashIndex++;
-					if (hashIndex == getTableSize()){hashIndex = 0;} // Wrap around array if needed
-				} else if (collisionMethod.equals(QUAD_PROBING)){
-					hashIndex = nCollisions * nCollisions + key.hashCode() % hashTable.length;
-					while(hashIndex >= getTableSize()){
-						hashIndex -= getTableSize();
-					}
-				}
+		if (currentHash == null) {  // Empty spot found
+			didRehash = checkRehashing();
+			if (didRehash){
+				ixAndCols = probing(key);  // Probe in newly created hash table for a spot
+				nCollisions += ixAndCols[1];  // Add collisions from probing new table
+				nCollisions += rehashCollisions;
+				hashIndex = ixAndCols[0];  // Save the newly found spot in the rehashed table
 			}
+			hashTable[hashIndex] = new HashEntry(key, value); // Insert the key
+			currentSize++;
+
+		} else if (currentHash.myKey.equals(key)) { // Duplicate key found, update value
+			hashTable[hashIndex].myValue = value;
+			didUpdate = true;
 		}
 
 		return new ResponseItem(value, nCollisions, didRehash, didUpdate);
 	}
 
-	// * make sure find portion of operation only is performed once
-	// * this cuts # of collisions to half the number that would be required if performed with
-	// * separate get/put operations
-	// The returned ResponseItem should contain the number of collisions involved in the initial find operation.
 	/**
 	 * Increment value of a key if it already exists. If it doesn't exist insert it and store a value 1 with it.
 	 * @param key The key to increment or insert.
@@ -142,50 +163,31 @@ public class ColorHash {
 	public ResponseItem increment(ColorKey key){
 
 		long value = 1;
-		int offset = 1; // Used for quad probing
 		int nCollisions = 0;
 		boolean didRehash = false;
 		boolean didUpdate = false;
 
+		int[] ixAndCols = probing(key); // Get insert/update position and numCollisions
+		int hashIndex = ixAndCols[0];
+		nCollisions = ixAndCols[1];
 
+		HashEntry currentHash = hashTable[hashIndex];
 
-		int hashIndex = key.hashCode() % hashTable.length; // Get the first target index
-
-		boolean keyFound = false; // True if we found a place to insert/update
-		while (!keyFound){
-
-			// Get the current hashTable item to see if it is available
-			HashEntry currentHash = hashTable[hashIndex];
-
-			if (currentHash == null) { // Nothing found at target index, insert entry
-				didRehash = checkRehashing();
-				if (didRehash) {
-					hashIndex = key.hashCode() % hashTable.length;
-					nCollisions += resizeCollisions;
-				}
-				hashTable[hashIndex] = new HashEntry(key, value);
-				currentSize++;
-				keyFound = true;
-
-			} else if (currentHash.myKey.equals(key)) { // Duplicate key found, increment value
-				value = hashTable[hashIndex].myValue += 1;
-				didUpdate = true;
-				keyFound = true;
-
-			} else {  // Otherwise we have a collision, and will probe for a new spot using specified collision method
-				nCollisions++;
-				if (collisionMethod.equals(LINEAR_PROBING)){
-					hashIndex++;
-					if (hashIndex == getTableSize()){hashIndex = 0;} // Wrap around array if needed
-				} else if (collisionMethod.equals(QUAD_PROBING)){
-					hashIndex = nCollisions * nCollisions + key.hashCode() % hashTable.length;
-					while(hashIndex >= getTableSize()){
-						hashIndex -= getTableSize();
-					}
-				}
+		if (currentHash == null) { // Empty spot found
+			didRehash = checkRehashing();
+			if (didRehash){
+				ixAndCols = probing(key);
+				nCollisions += rehashCollisions;
+				nCollisions += ixAndCols[1];
+				hashIndex = ixAndCols[0];
 			}
-		}
+			hashTable[hashIndex] = new HashEntry(key, value);
+			currentSize++;
 
+		} else if (currentHash.myKey.equals(key)) { // Duplicate key found, increment value
+			value = hashTable[hashIndex].myValue += 1;
+			didUpdate = true;
+		}
 		return new ResponseItem(value, nCollisions, didRehash, didUpdate);
 	}
 
@@ -198,38 +200,21 @@ public class ColorHash {
 	public ResponseItem colorHashGet(ColorKey key)  throws Exception{
 
 		long value = -1L;
-		int offset = 1; // Used for quad probing
 		int nCollisions = 0;
 		boolean didRehash = false;
 		boolean didUpdate = false;
 
-		int hashIndex = key.hashCode() % hashTable.length; // Get the first target index
 
-		boolean keyFound = false; // True if we found a place to insert/update
-		while (!keyFound){
+		int[] ixAndCols = probing(key); // Get insert/update position and numCollisions
+		int hashIndex = ixAndCols[0];
+		nCollisions = ixAndCols[1];
 
-			// Get the current hashTable item to see if it is available
-			HashEntry currentHash = hashTable[hashIndex];
+		HashEntry currentHash = hashTable[hashIndex];
 
-			if (currentHash == null) { // Nothing found at target index, throw exception
-				throw new MissingColorKeyException("Key not found");
-
-			} else if (currentHash.myKey.equals(key)) { // Key found, get value
-				value = hashTable[hashIndex].myValue;
-				keyFound = true;
-
-			} else {  // Otherwise we have a collision, and will probe for a new spot using specified collision method
-				nCollisions++;
-				if (collisionMethod.equals(LINEAR_PROBING)){
-					hashIndex++;
-					if (hashIndex == getTableSize()){hashIndex = 0;} // Wrap around array if needed
-				} else if (collisionMethod.equals(QUAD_PROBING)){
-					hashIndex = nCollisions * nCollisions + key.hashCode() % hashTable.length;
-					while(hashIndex >= getTableSize()){
-						hashIndex -= getTableSize();
-					}
-				}
-			}
+		if (currentHash == null) { // Empty spot
+			throw new MissingColorKeyException("Key not found");
+		} else if (currentHash.myKey.equals(key)) { // Key found, return the value
+			value = hashTable[hashIndex].myValue;
 		}
 
 		return new ResponseItem(value, nCollisions, didRehash, didUpdate);
@@ -246,55 +231,45 @@ public class ColorHash {
 		long value = -1L;
 		int nCollisions = 0;
 
-		int hashIndex = key.hashCode() % hashTable.length; // Get the first target index
+		int[] ixAndCols = probing(key); // Get insert/update position and numCollisions
+		int hashIndex = ixAndCols[0];
+		nCollisions = ixAndCols[1];
 
-		boolean keyFound = false; // True if we found a place to insert/update
-		while (!keyFound){
+		HashEntry currentHash = hashTable[hashIndex];
 
-			// Get the current hashTable item to see if it is available
-			HashEntry currentHash = hashTable[hashIndex];
-
-			if (currentHash == null) { // Nothing found at target index, return 0
-				value = 0L;
-				keyFound = true;
-
-			} else if (currentHash.myKey.equals(key)) { // Key found, get value
-				value = hashTable[hashIndex].myValue;
-				keyFound = true;
-
-			} else {  // Otherwise we have a collision, and will probe for a new spot using specified collision method
-				nCollisions++;
-				if (collisionMethod.equals(LINEAR_PROBING)){
-					hashIndex++;
-					if (hashIndex == getTableSize()){hashIndex = 0;} // Wrap around array if needed
-				} else if (collisionMethod.equals(QUAD_PROBING)){
-					hashIndex = nCollisions * nCollisions + key.hashCode() % hashTable.length;
-					while(hashIndex >= getTableSize()){
-						hashIndex -= getTableSize();
-					}
-				}
-			}
+		if (currentHash == null) { // Key not found, so we return 0
+			value = 0L;
+		} else if (currentHash.myKey.equals(key)) { // Key found, return associated value
+			value = hashTable[hashIndex].myValue;
 		}
 
 		return value;
 	}
 
-	// TODO Is it okay to use ints for the currentSize, etc.
-	// TODO throw exception if index is null? what about out of index range?
+	// TODO what if the key is null?
 	/**
 	 * Gets the Key at the specified index.
 	 * @param tableIndex The index of the hash table.
 	 * @return Returns a key in the hash table.
+	 * @throws IndexOutOfBoundsException If index is not in the table.
 	 */
-	public ColorKey getKeyAt(int tableIndex){ return hashTable[tableIndex].myKey; }
+	public ColorKey getKeyAt(int tableIndex){
+		if (tableIndex >= getTableSize() || tableIndex < 0){
+			throw new IndexOutOfBoundsException();
+		}
+		return hashTable[tableIndex].myKey;
+	}
 
-	// TODO throw exception or return 0 if no value exists
 	/**
-	 * Gets the value stored at the index location specified.
+	 * Gets the value stored at the index location.
 	 * @param tableIndex The index of the hash table value to return.
 	 * @return Returns the value specified by the index.
 	 */
 	public long getValueAt(int tableIndex){
+		if (tableIndex >= getTableSize() || tableIndex < 0){
+			throw new IndexOutOfBoundsException();
+		}
+
 		if (hashTable[tableIndex] == null){
 			return -1L;
 		} else {
@@ -317,11 +292,12 @@ public class ColorHash {
 
 	/**
 	 * Resizes the hash table to the next prime number that is at least double the old size.
+	 * It also counts the collisions during rehashing and saves it into a private variable.
 	 */
-	private int resizeCollisions = 0;
+	private int rehashCollisions = 0;
 	public void resize(){
 
-		resizeCollisions = 0;
+		rehashCollisions = 0;
 
 		// new table size must be at least double the old size
 		int newTableSize = getTableSize() * 2;
@@ -338,7 +314,7 @@ public class ColorHash {
 				currentHash = hashTable[i];
 				if (currentHash != null){
 					ResponseItem ri = tempCH.colorHashPut(currentHash.getKey(), currentHash.getValue());
-					resizeCollisions += ri.nCollisions;
+					rehashCollisions += ri.nCollisions;
 				}
 			}
 			hashTable = tempHT;
@@ -346,14 +322,6 @@ public class ColorHash {
 			System.out.println(InvalidLoadFactor);
 		}
 
-	}
-
-	/**
-	 * Gets the current hash table.
-	 * @return Returns the hash table
-	 */
-	HashEntry[] getHashTable(){
-		return hashTable;
 	}
 
 	/**
@@ -366,6 +334,14 @@ public class ColorHash {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Gets the current hash table.
+	 * @return Returns the hash table
+	 */
+	HashEntry[] getHashTable(){
+		return hashTable;
 	}
 
 	/**
@@ -392,56 +368,5 @@ public class ColorHash {
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Only for testing purposes
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			ColorKey black = new ColorKey(0, 0, 0, 6);
-			System.out.println("black's color key is: "+black);
-			ColorKey white = new ColorKey(255, 255, 255, 6);
-			System.out.println("white color key is: "+white);
-			ColorKey green = new ColorKey(0, 255, 0, 6);
-			System.out.println("green color key is: "+green);
-			ColorKey other1 = new ColorKey(122, 255, 0, 6);
-			System.out.println("other1 color key is: "+other1);
-			ColorKey other2 = new ColorKey(255, 122, 0, 6);
-			System.out.println("other2 color key is: "+other2);
-			ColorKey other3 = new ColorKey(0, 255, 122, 6);
-			System.out.println("other1 color key is: "+other3);
-			ColorKey other4 = new ColorKey(0, 255, 255, 6);
-			System.out.println("other2 color key is: "+other4);
-			ColorKey number17 = new ColorKey(17, 6); // Call to the alternative constructor
-			System.out.println("number17 color key is: "+number17);
-//            ColorKey blah = new ColorKey(255, 255, 255, 10);
-//            System.out.println("blah color key is: "+blah);
-			ColorHash testCH = new ColorHash(3, 6, "Quadtrad", 0.9);
-			testCH.increment(white);
-			testCH.increment(black);
-			testCH.increment(black);
-			testCH.increment(green);
-			testCH.increment(green);
-			testCH.increment(green);
-//			testCH.increment(other1);
-//			testCH.increment(other2);
-//			testCH.increment(other3);
-//			testCH.increment(other4);
-//			testCH.increment(number17);
-//            System.out.println(testCH.getKeyAt(0));
-			for (int i = 0; i < testCH.getTableSize(); i++) {
-//                if (testCH.getKeyAt(i) != null) {
-//                    System.out.println(testCH.getKeyAt(i));
-//                }
-				System.out.println(testCH.getValueAt(i));
-			}
-			System.out.println("TEST");
-		}
-		catch(Exception e) {
-			System.out.println(e);
-		}
-	}
-
 }
+
