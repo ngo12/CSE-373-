@@ -1,6 +1,7 @@
 /**
- * // TODO describe class!!
- * @author
+ * This class compares paintings in a variety of ways using the hash table (ColorHash)
+ * and cosine similarity.
+ * @author Ryan Linden, Brandon Ngo
  *
  */
 public class ComparePaintings {
@@ -86,7 +87,6 @@ public class ComparePaintings {
 
 	}
 
-	// TODO Finish quad probing and uncomment it
 	/**
 	 * using the three painting images and their bits-per-pixel values, compute and print out a table of collision counts
 	 */
@@ -114,15 +114,15 @@ public class ComparePaintings {
 			System.out.format("%-20d", starryCP.collisionSum);
 			christinaCP.probingMethod = ColorHash.LINEAR_PROBING;
 			christinaCP.countColors("ChristinasWorld.jpg", bpp);
-			System.out.format("%-20d", starryCP.collisionSum);
+			System.out.format("%-20d", christinaCP.collisionSum);
 			christinaCP.probingMethod = ColorHash.QUAD_PROBING;
 			christinaCP.countColors("ChristinasWorld.jpg", bpp);
-			System.out.format("%-22d%n", starryCP.collisionSum);
+			System.out.format("%-22d%n", christinaCP.collisionSum);
 		}
 	}
 
 	/**
-	 * Compares similarity with ... TODO not sure exactly how this test works
+	 * Compares similarity with the three original images
 	 */
 	void fullSimilarityTests(){
 		ComparePaintings monaCP = new ComparePaintings();
@@ -131,18 +131,179 @@ public class ComparePaintings {
 
 		System.out.println("Bits Per Pixel       S(Mona,Starry)    S(Mona,Christina)     S(Starry,Christina)");
 		for (int bpp = 24; bpp >= 3; bpp-=3) {
-			System.out.format("%-21d", bpp);
 
 			monaCP.countColors("MonaLisa.jpg", bpp);
-			System.out.format("%-18f", monaCP.myFV.cosineSimilarity(monaCP.myFV) );
-
 			starryCP.countColors("StarryNight.jpg", bpp);
-			System.out.format("%-22f", starryCP.myFV.cosineSimilarity(starryCP.myFV) );
-
 			christinaCP.countColors("ChristinasWorld.jpg", bpp);
-			System.out.format("%-22f%n", christinaCP.myFV.cosineSimilarity(christinaCP.myFV) );
+
+			System.out.format("%-21d", bpp);
+			System.out.format("%-18f", monaCP.myFV.cosineSimilarity(starryCP.myFV) );
+			System.out.format("%-22f", monaCP.myFV.cosineSimilarity(christinaCP.myFV) );
+			System.out.format("%-22f%n", starryCP.myFV.cosineSimilarity(christinaCP.myFV) );
 		}
 
+	}
+
+	/**
+	 * EXTRA CREDIT :
+	 * Compares ten images and displays results in a table
+	 */
+	void tenImagesSimilarityTest(){
+
+		int bpp = 6;
+		ComparePaintings christinaCP = new ComparePaintings();
+		ComparePaintings monaCP = new ComparePaintings();
+		ComparePaintings starryCP = new ComparePaintings();
+		ComparePaintings screamCP = new ComparePaintings();
+		ComparePaintings sundayCP = new ComparePaintings();
+		ComparePaintings butlerCP = new ComparePaintings();
+		ComparePaintings nightCP = new ComparePaintings();
+		ComparePaintings girlCP = new ComparePaintings();
+		ComparePaintings dogsCP = new ComparePaintings();
+		ComparePaintings persistenceCP = new ComparePaintings();
+		christinaCP.countColors("ChristinasWorld.jpg", bpp);
+		monaCP.countColors("MonaLisa.jpg", bpp);
+		starryCP.countColors("StarryNight.jpg", bpp);
+		screamCP.countColors("TheScream.jpg", bpp);
+		sundayCP.countColors("SundayAfternoon.jpg", bpp);
+		butlerCP.countColors("SingingButler.jpg", bpp);
+		nightCP.countColors("Nighthawks.jpg", bpp);
+		girlCP.countColors("GirlPearlEarring.jpg", bpp);
+		dogsCP.countColors("DogsPlayingPoker.jpg", bpp);
+		persistenceCP.countColors("Persistence.jpg", bpp);
+
+
+		System.out.print(String.format("%-20s", ""));
+		System.out.print(String.format("%-19s", "ChristinasWorld"));
+		System.out.print(String.format("%-12s", "MonaLisa"));
+		System.out.print(String.format("%-15s", "StarryNight"));
+		System.out.print(String.format("%-13s", "TheScream"));
+		System.out.print(String.format("%-19s", "SundayAfternoon"));
+		System.out.print(String.format("%-17s", "SingingButler"));
+		System.out.print(String.format("%-14s", "Nighthawks"));
+		System.out.print(String.format("%-20s", "GirlPearlEarring"));
+		System.out.print(String.format("%-20s", "DogsPlayingPoker"));
+    	System.out.println(String.format("%-15s", "Persistence"));
+
+		System.out.print(String.format("%-20s", "ChristinasWorld"));
+		System.out.format("%-19f", christinaCP.myFV.cosineSimilarity(christinaCP.myFV));
+		System.out.format("%-12f", christinaCP.myFV.cosineSimilarity(monaCP.myFV));
+		System.out.format("%-15f", christinaCP.myFV.cosineSimilarity(starryCP.myFV));
+		System.out.format("%-13f", christinaCP.myFV.cosineSimilarity(screamCP.myFV));
+		System.out.format("%-19f", christinaCP.myFV.cosineSimilarity(sundayCP.myFV));
+		System.out.format("%-17f", christinaCP.myFV.cosineSimilarity(butlerCP.myFV));
+		System.out.format("%-14f", christinaCP.myFV.cosineSimilarity(nightCP.myFV));
+		System.out.format("%-20f", christinaCP.myFV.cosineSimilarity(girlCP.myFV));
+		System.out.format("%-20f", christinaCP.myFV.cosineSimilarity(dogsCP.myFV));
+		System.out.format("%-15f%n", christinaCP.myFV.cosineSimilarity(persistenceCP.myFV));
+
+		System.out.print(String.format("%-20s", "MonaLisa"));
+		System.out.format("%-19f", monaCP.myFV.cosineSimilarity(christinaCP.myFV));
+		System.out.format("%-12f", monaCP.myFV.cosineSimilarity(monaCP.myFV));
+		System.out.format("%-15f", monaCP.myFV.cosineSimilarity(starryCP.myFV));
+		System.out.format("%-13f", monaCP.myFV.cosineSimilarity(screamCP.myFV));
+		System.out.format("%-19f", monaCP.myFV.cosineSimilarity(sundayCP.myFV));
+		System.out.format("%-17f", monaCP.myFV.cosineSimilarity(butlerCP.myFV));
+		System.out.format("%-14f", monaCP.myFV.cosineSimilarity(nightCP.myFV));
+		System.out.format("%-20f", monaCP.myFV.cosineSimilarity(girlCP.myFV));
+		System.out.format("%-20f", monaCP.myFV.cosineSimilarity(dogsCP.myFV));
+		System.out.format("%-15f%n", monaCP.myFV.cosineSimilarity(persistenceCP.myFV));
+
+		System.out.print(String.format("%-20s", "StarryNight"));
+		System.out.format("%-19f", starryCP.myFV.cosineSimilarity(christinaCP.myFV));
+		System.out.format("%-12f", starryCP.myFV.cosineSimilarity(monaCP.myFV));
+		System.out.format("%-15f", starryCP.myFV.cosineSimilarity(starryCP.myFV));
+		System.out.format("%-13f", starryCP.myFV.cosineSimilarity(screamCP.myFV));
+		System.out.format("%-19f", starryCP.myFV.cosineSimilarity(sundayCP.myFV));
+		System.out.format("%-17f", starryCP.myFV.cosineSimilarity(butlerCP.myFV));
+		System.out.format("%-14f", starryCP.myFV.cosineSimilarity(nightCP.myFV));
+		System.out.format("%-20f", starryCP.myFV.cosineSimilarity(girlCP.myFV));
+		System.out.format("%-20f", starryCP.myFV.cosineSimilarity(dogsCP.myFV));
+		System.out.format("%-15f%n", starryCP.myFV.cosineSimilarity(persistenceCP.myFV));
+
+		System.out.print(String.format("%-20s", "TheScream"));
+		System.out.format("%-19f", screamCP.myFV.cosineSimilarity(christinaCP.myFV));
+		System.out.format("%-12f", screamCP.myFV.cosineSimilarity(monaCP.myFV));
+		System.out.format("%-15f", screamCP.myFV.cosineSimilarity(starryCP.myFV));
+		System.out.format("%-13f", screamCP.myFV.cosineSimilarity(screamCP.myFV));
+		System.out.format("%-19f", screamCP.myFV.cosineSimilarity(sundayCP.myFV));
+		System.out.format("%-17f", screamCP.myFV.cosineSimilarity(butlerCP.myFV));
+		System.out.format("%-14f", screamCP.myFV.cosineSimilarity(nightCP.myFV));
+		System.out.format("%-20f", screamCP.myFV.cosineSimilarity(girlCP.myFV));
+		System.out.format("%-20f", screamCP.myFV.cosineSimilarity(dogsCP.myFV));
+		System.out.format("%-15f%n", screamCP.myFV.cosineSimilarity(persistenceCP.myFV));
+
+		System.out.print(String.format("%-20s", "SundayAfternoon"));
+		System.out.format("%-19f", sundayCP.myFV.cosineSimilarity(christinaCP.myFV));
+		System.out.format("%-12f", sundayCP.myFV.cosineSimilarity(monaCP.myFV));
+		System.out.format("%-15f", sundayCP.myFV.cosineSimilarity(starryCP.myFV));
+		System.out.format("%-13f", sundayCP.myFV.cosineSimilarity(screamCP.myFV));
+		System.out.format("%-19f", sundayCP.myFV.cosineSimilarity(sundayCP.myFV));
+		System.out.format("%-17f", sundayCP.myFV.cosineSimilarity(butlerCP.myFV));
+		System.out.format("%-14f", sundayCP.myFV.cosineSimilarity(nightCP.myFV));
+		System.out.format("%-20f", sundayCP.myFV.cosineSimilarity(girlCP.myFV));
+		System.out.format("%-20f", sundayCP.myFV.cosineSimilarity(dogsCP.myFV));
+		System.out.format("%-15f%n", sundayCP.myFV.cosineSimilarity(persistenceCP.myFV));
+
+		System.out.print(String.format("%-20s", "SingingButler"));
+		System.out.format("%-19f", butlerCP.myFV.cosineSimilarity(christinaCP.myFV));
+		System.out.format("%-12f", butlerCP.myFV.cosineSimilarity(monaCP.myFV));
+		System.out.format("%-15f", butlerCP.myFV.cosineSimilarity(starryCP.myFV));
+		System.out.format("%-13f", butlerCP.myFV.cosineSimilarity(screamCP.myFV));
+		System.out.format("%-19f", butlerCP.myFV.cosineSimilarity(sundayCP.myFV));
+		System.out.format("%-17f", butlerCP.myFV.cosineSimilarity(butlerCP.myFV));
+		System.out.format("%-14f", butlerCP.myFV.cosineSimilarity(nightCP.myFV));
+		System.out.format("%-20f", butlerCP.myFV.cosineSimilarity(girlCP.myFV));
+		System.out.format("%-20f", butlerCP.myFV.cosineSimilarity(dogsCP.myFV));
+		System.out.format("%-15f%n", butlerCP.myFV.cosineSimilarity(persistenceCP.myFV));
+
+		System.out.print(String.format("%-20s", "Nighthawks"));
+		System.out.format("%-19f", nightCP.myFV.cosineSimilarity(christinaCP.myFV));
+		System.out.format("%-12f", nightCP.myFV.cosineSimilarity(monaCP.myFV));
+		System.out.format("%-15f", nightCP.myFV.cosineSimilarity(starryCP.myFV));
+		System.out.format("%-13f", nightCP.myFV.cosineSimilarity(screamCP.myFV));
+		System.out.format("%-19f", nightCP.myFV.cosineSimilarity(sundayCP.myFV));
+		System.out.format("%-17f", nightCP.myFV.cosineSimilarity(butlerCP.myFV));
+		System.out.format("%-14f", nightCP.myFV.cosineSimilarity(nightCP.myFV));
+		System.out.format("%-20f", nightCP.myFV.cosineSimilarity(girlCP.myFV));
+		System.out.format("%-20f", nightCP.myFV.cosineSimilarity(dogsCP.myFV));
+		System.out.format("%-15f%n", nightCP.myFV.cosineSimilarity(persistenceCP.myFV));
+
+		System.out.print(String.format("%-20s", "GirlPearlEarring"));
+		System.out.format("%-19f", girlCP.myFV.cosineSimilarity(christinaCP.myFV));
+		System.out.format("%-12f", girlCP.myFV.cosineSimilarity(monaCP.myFV));
+		System.out.format("%-15f", girlCP.myFV.cosineSimilarity(starryCP.myFV));
+		System.out.format("%-13f", girlCP.myFV.cosineSimilarity(screamCP.myFV));
+		System.out.format("%-19f", girlCP.myFV.cosineSimilarity(sundayCP.myFV));
+		System.out.format("%-17f", girlCP.myFV.cosineSimilarity(butlerCP.myFV));
+		System.out.format("%-14f", girlCP.myFV.cosineSimilarity(nightCP.myFV));
+		System.out.format("%-20f", girlCP.myFV.cosineSimilarity(girlCP.myFV));
+		System.out.format("%-20f", girlCP.myFV.cosineSimilarity(dogsCP.myFV));
+		System.out.format("%-15f%n", girlCP.myFV.cosineSimilarity(persistenceCP.myFV));
+
+		System.out.print(String.format("%-20s", "DogsPlayingPoker"));
+		System.out.format("%-19f", dogsCP.myFV.cosineSimilarity(christinaCP.myFV));
+		System.out.format("%-12f", dogsCP.myFV.cosineSimilarity(monaCP.myFV));
+		System.out.format("%-15f", dogsCP.myFV.cosineSimilarity(starryCP.myFV));
+		System.out.format("%-13f", dogsCP.myFV.cosineSimilarity(screamCP.myFV));
+		System.out.format("%-19f", dogsCP.myFV.cosineSimilarity(sundayCP.myFV));
+		System.out.format("%-17f", dogsCP.myFV.cosineSimilarity(butlerCP.myFV));
+		System.out.format("%-14f", dogsCP.myFV.cosineSimilarity(nightCP.myFV));
+		System.out.format("%-20f", dogsCP.myFV.cosineSimilarity(girlCP.myFV));
+		System.out.format("%-20f", dogsCP.myFV.cosineSimilarity(dogsCP.myFV));
+		System.out.format("%-15f%n", dogsCP.myFV.cosineSimilarity(persistenceCP.myFV));
+
+		System.out.print(String.format("%-20s", "Persistence"));
+		System.out.format("%-19f", persistenceCP.myFV.cosineSimilarity(christinaCP.myFV));
+		System.out.format("%-12f", persistenceCP.myFV.cosineSimilarity(monaCP.myFV));
+		System.out.format("%-15f", persistenceCP.myFV.cosineSimilarity(starryCP.myFV));
+		System.out.format("%-13f", persistenceCP.myFV.cosineSimilarity(screamCP.myFV));
+		System.out.format("%-19f", persistenceCP.myFV.cosineSimilarity(sundayCP.myFV));
+		System.out.format("%-17f", persistenceCP.myFV.cosineSimilarity(butlerCP.myFV));
+		System.out.format("%-14f", persistenceCP.myFV.cosineSimilarity(nightCP.myFV));
+		System.out.format("%-20f", persistenceCP.myFV.cosineSimilarity(girlCP.myFV));
+		System.out.format("%-20f", persistenceCP.myFV.cosineSimilarity(dogsCP.myFV));
+		System.out.format("%-15f%n", persistenceCP.myFV.cosineSimilarity(persistenceCP.myFV));
 	}
 
 	/**
@@ -156,39 +317,14 @@ public class ComparePaintings {
 	}
 
 	/**
-	 * This is a basic testing function, and can be changed.
+	 * Uncomment the test you want to run
 	 */
-
-//    public static void main(String[] args) {
-//        ComparePaintings cp = new ComparePaintings();
-//        cp.countColors("MonaLisa.jpg", BPP);
+    public static void main(String[] args) {
+        ComparePaintings cp = new ComparePaintings();
 //        cp.fullSimilarityTests();
-//    }
+//		cp.CollisionTests();
+		cp.tenImagesSimilarityTest();
+    }
 
-	public static void main(String[] args) {
-		ComparePaintings cp = new ComparePaintings();
-		cp.CollisionTests();
-	}
-
-//	public static void main(String[] args) {
-//		ComparePaintings cp = new ComparePaintings();
-//		cp.imageLoadingTest();
-//        cp.countColors("MonaLisa.jpg", BPP);
-////		cp.countColors("ChristinasWorld.jpg", 6);
-//		long sum = 0;
-//		for (int i = 0; i < 37; i++) {
-//			System.out.println(cp.myCH.getValueAt(i));
-//            sum+=cp.myCH.getValueAt(i);
-//		}
-//		System.out.println(sum);
-//		System.out.println("COLOR COUNTS:");
-//		for (int i = 0; i < cp.myFV.colorCounts.length; i++) {
-//			System.out.print("Color Count " + i + ": ");
-//			System.out.println(cp.myFV.colorCounts[i]);
-//		}
-//
-//		cp.basicTest("ChristinasWorld.jpg");
-//
-//	}
 
 }
