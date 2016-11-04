@@ -85,16 +85,8 @@ public class ComparePaintings {
 		otherCP.countColors(filename, this.myCH.getBPP());
 		System.out.print("Cosine Similarity = ");
 		System.out.println(compare(myCH, otherCP.myCH));
-
-//		if (myFV == null) {
-//			throw new IllegalArgumentException("Must countColors() before calling this method");
-//		}
-//		ComparePaintings otherCP = new ComparePaintings();
-//		myCH = otherCP.countColors(filename, BPP);
-//		System.out.print("Cosine Similarity = ");
-//		System.out.println(myFV.cosineSimilarity(otherCP.myFV));
-
 	}
+
 	/**
 	 * using the three painting images and their bits-per-pixel values, compute and print out a table of collision counts
 	 */
