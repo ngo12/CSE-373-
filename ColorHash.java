@@ -1,7 +1,6 @@
 /**
  * ColorHash is a hash table for the ColorKey object.
- * @author Brandon Ngo, Ryan Linden
- *
+ * @author Ryan Linden ID:1571298, Brandon Ngo ID:1462375
  */
 public class ColorHash {
 
@@ -74,6 +73,12 @@ public class ColorHash {
 			return myValue;
 		}
 	}
+
+	/**
+	 * Gets the bits per pixel value for this hash table
+	 * @return Bits per pixel of the hash table
+	 */
+	int getBPP(){ return bpp; }
 
 	/**
 	 * Probes the hash table for the insert/update location of the ColorKey, counting collisions along the way.
@@ -246,7 +251,6 @@ public class ColorHash {
 		return value;
 	}
 
-	// TODO what if the key is null?
 	/**
 	 * Gets the Key at the specified index.
 	 * @param tableIndex The index of the hash table.
@@ -257,7 +261,11 @@ public class ColorHash {
 		if (tableIndex >= getTableSize() || tableIndex < 0){
 			throw new IndexOutOfBoundsException();
 		}
-		return hashTable[tableIndex].myKey;
+		try {
+			return hashTable[tableIndex].myKey;
+		} catch (NullPointerException e){
+			return null;
+		}
 	}
 
 	/**
@@ -304,8 +312,8 @@ public class ColorHash {
 		// new table size must be a prime number
 		while (!IsPrime.isPrime(newTableSize)){ newTableSize++; }
 
-		// Create temps
 		try{
+			// Create temps
 			ColorHash tempCH = new ColorHash(newTableSize, bpp, collisionMethod, rhLoadFactor);
 			HashEntry[] tempHT = tempCH.getHashTable();
 
