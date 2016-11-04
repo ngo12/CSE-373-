@@ -1,14 +1,14 @@
 /**
  * This class compares paintings in a variety of ways using the hash table (ColorHash)
  * and cosine similarity.
- * @author Ryan Linden, Brandon Ngo
+ * @author Ryan Linden ID:1571298, Brandon Ngo ID:1462375
  *
  */
 public class ComparePaintings {
 
 	// Constants
 	private static final int BPP = 6;
-	private static final int INITIAL_TABLE_SIZE = 11;
+	private static final int INITIAL_TABLE_SIZE = 3;
 	private static final double REHASH_LOAD_FACTOR = 0.4;
 
 	// Declare members
@@ -58,7 +58,6 @@ public class ComparePaintings {
 		return myCH;
 	}
 
-	// TODO What should bpp be? what if bpp is different for each?
 	/**
 	 * Compute the similarity of two hash tables of color counts using cosine similarity
 	 * @param painting1 The first painting to compare.
@@ -66,27 +65,36 @@ public class ComparePaintings {
 	 * @return Returns the cosine similarity value, with 1 being an optimal match.
 	 */
 	double compare(ColorHash painting1, ColorHash painting2) {
-		FeatureVector fv1 = new FeatureVector(BPP);
-		FeatureVector fv2 = new FeatureVector(BPP);
+		FeatureVector fv1 = new FeatureVector(painting1.getBPP());
+		FeatureVector fv2 = new FeatureVector(painting2.getBPP());
 		fv1.getTheCounts(painting1);
 		fv2.getTheCounts(painting2);
 		return fv1.cosineSimilarity(fv2);
 	}
 
-	// TODO do i need to countColors here? or can we assume its been done? maybe use a flag?
-	// TODO or is this supposed to be for any file or just the same one?
 	/**
 	 * A basic test for the compare method: S(x,x) should be 1.0 if comparing an image with itself.
 	 * @param filename The file to compare with.
+	 * @throws IllegalArgumentException If countColors() has not been called and thus the feature vector is not populated
 	 */
 	void basicTest(String filename) {
+		if (myFV == null) {
+			throw new IllegalArgumentException("Must countColors() before calling this method");
+		}
 		ComparePaintings otherCP = new ComparePaintings();
-		otherCP.countColors(filename, BPP);
+		otherCP.countColors(filename, this.myCH.getBPP());
 		System.out.print("Cosine Similarity = ");
-		System.out.println(myFV.cosineSimilarity(otherCP.myFV));
+		System.out.println(compare(myCH, otherCP.myCH));
+
+//		if (myFV == null) {
+//			throw new IllegalArgumentException("Must countColors() before calling this method");
+//		}
+//		ComparePaintings otherCP = new ComparePaintings();
+//		myCH = otherCP.countColors(filename, BPP);
+//		System.out.print("Cosine Similarity = ");
+//		System.out.println(myFV.cosineSimilarity(otherCP.myFV));
 
 	}
-
 	/**
 	 * using the three painting images and their bits-per-pixel values, compute and print out a table of collision counts
 	 */
@@ -142,6 +150,16 @@ public class ComparePaintings {
 			System.out.format("%-22f%n", starryCP.myFV.cosineSimilarity(christinaCP.myFV) );
 		}
 
+	}
+
+	/**
+	 * Checks that the images can be loaded so missing file/bad path exceptions do not arise
+	 */
+	void imageLoadingTest() {
+		ImageLoader mona = new ImageLoader("MonaLisa.jpg");
+		ImageLoader starry = new ImageLoader("StarryNight.jpg");
+		ImageLoader christina = new ImageLoader("ChristinasWorld.jpg");
+		System.out.println("It looks like we have successfully loaded all three test images.");
 	}
 
 	/**
@@ -306,24 +324,15 @@ public class ComparePaintings {
 		System.out.format("%-15f%n", persistenceCP.myFV.cosineSimilarity(persistenceCP.myFV));
 	}
 
-	/**
-	 * Checks that the images can be loaded so missing file/bad path exceptions do not arise
-	 */
-	void imageLoadingTest() {
-		ImageLoader mona = new ImageLoader("MonaLisa.jpg");
-		ImageLoader starry = new ImageLoader("StarryNight.jpg");
-		ImageLoader christina = new ImageLoader("ChristinasWorld.jpg");
-		System.out.println("It looks like we have successfully loaded all three test images.");
-	}
 
 	/**
 	 * Uncomment the test you want to run
 	 */
     public static void main(String[] args) {
         ComparePaintings cp = new ComparePaintings();
-//        cp.fullSimilarityTests();
+        cp.fullSimilarityTests();
 //		cp.CollisionTests();
-		cp.tenImagesSimilarityTest();
+//		cp.tenImagesSimilarityTest();
     }
 
 
