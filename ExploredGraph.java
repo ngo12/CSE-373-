@@ -104,9 +104,33 @@ public class ExploredGraph {
 		}
 	}
 	
+	// Edges contain two vertices to show that it is the edge between them
 	class Edge {
+		private Vertex vi, vj;
+		
+		// Construct an edge using two vertices
 		public Edge(Vertex vi, Vertex vj) {
-			// Add whatever you need to here.
+			this.vi = vi;
+			this.vj = vj;
+		}
+		
+		// Return a string representation of an edge
+		public String toString() {
+			String ans = "Edge from ";
+			ans += vi.toString();
+			ans += " to ";
+			ans += vj.toString();
+			return ans;
+		}
+		
+		// Return the first vertex end point
+		public Vertex getEndPoint1(){
+			return vi;
+		}
+		
+		// Return the second vertex end point
+		public Vertex getEndPoint2(){
+			return vj;
 		}
 	}
 	
