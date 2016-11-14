@@ -34,16 +34,21 @@ public class ExploredGraph {
 		Ee = new LinkedHashSet<Edge>();
 	}
 
-	public void initialize() {
-		// Implement this
+	public void initialize(v) {
+		// TODO Check for valid # of pegs?
+		Ve.add(v);
 	}
+	
 	public int nvertices() {
 		return Ve.size(); // Will return the size of the Ve LinkedHashSet
 	} 
+	
 	public int nedges() {
 		return Ee.size(); // Will return the size of the Ee LinkedHashSet
-	}    // Implement this.
+	}
+
 	public void idfs(Vertex vi, Vertex vj) {} // Implement this. (Iterative Depth-First Search)
+	
 	public void bfs(Vertex vi, Vertex vj) {} // Implement this. (Breadth-First Search)
 	public ArrayList<Vertex> retrievePath(Vertex vi) {return null;} // Implement this.
 	public ArrayList<Vertex> shortestPath(Vertex vi, Vertex vj) {return null;} // Implement this.
