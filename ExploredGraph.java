@@ -28,6 +28,7 @@ import java.util.function.Function;
 public class ExploredGraph {
 	Set<Vertex> Ve; // collection of explored vertices
 	Set<Edge> Ee;   // collection of explored edges
+	Vertex startVe; // starting point, TODO do we need it?
 	
 	public ExploredGraph() {
 		Ve = new LinkedHashSet<Vertex>();
@@ -36,6 +37,7 @@ public class ExploredGraph {
 
 	public void initialize(v) {
 		// TODO Check for valid # of pegs?
+		startVe = v;
 		Ve.add(v);
 	}
 	
@@ -47,7 +49,22 @@ public class ExploredGraph {
 		return Ee.size(); // Will return the size of the Ee LinkedHashSet
 	}
 
-	public void idfs(Vertex vi, Vertex vj) {} // Implement this. (Iterative Depth-First Search)
+	public void idfs(Vertex vi, Vertex vj) {
+		// use stack for open set
+		Stack openVe = new Stack();
+		Stack closedVe = new Stack();
+		// Add Start vertex to open set
+		openVe.push(vi);
+		// While open set not empty:
+		while !openVe.empty() {
+			// pop node from open set
+			currentVe = openVe.pop;
+			// for each child of v:
+				// check if child visited already
+				// if not, add to open set
+				// add v to closed
+		}
+	} // Implement this. (Iterative Depth-First Search)
 	
 	public void bfs(Vertex vi, Vertex vj) {} // Implement this. (Breadth-First Search)
 	public ArrayList<Vertex> retrievePath(Vertex vi) {return null;} // Implement this.
