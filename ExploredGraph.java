@@ -12,6 +12,7 @@ import java.util.function.Function;
  * 1. What is count for in the searches?
  * 2. As we do IDFS/BFS do we add to the graph set? Or only when actually making a move/retrieve/shortest graph?
  * 3. Pseudocode for IDFS/BFS have param vj, but the pseudocode makes it seem like we traverse entire graph?
+ * 4. Should we clear predecessors at each search?
  */
 
 /**
@@ -31,12 +32,27 @@ import java.util.function.Function;
 public class ExploredGraph {
 	Set<Vertex> Ve; // collection of explored vertices
 	Set<Edge> Ee;   // collection of explored edges
-	Set<Vertex, Vertex> pred;
+	Set<Vertex, Vertex> pred; // predecessors of explored vertices, i.e. <vertex, vertexPred>
+	
+	Set<Operator> pegMoves;
+	Operator peg0to1;
+	Operator peg0to2;
+	Operator peg1to0;
+	Operator peg1to2;
+	Operator peg2to0;
+	Operator peg2to1;
 	
 	public ExploredGraph() {
 		Ve = new LinkedHashSet<Vertex>();
 		Ee = new LinkedHashSet<Edge>();
 		pred = new LinkedHashMap<Vertex, Vertex>();
+		pegMoves = new LinkedHashSet<Operator>;
+		pegMoves.add(peg0to1 = new Operator(0, 1));
+		pegMoves.add(peg0to2 = new Operator(0, 2));
+		pegMoves.add(peg1to0 = new Operator(1, 0));
+		pegMoves.add(peg1to2 = new Operator(1, 2));
+		pegMoves.add(peg2to0 = new Operator(2, 0));
+		pegMoves.add(peg2to1 = new Operator(2, 1));
 	}
 
 	public void initialize(v) {
@@ -53,32 +69,39 @@ public class ExploredGraph {
 	}
 
 	public void idfs(Vertex vi, Vertex vj) {
+		boolean endSearch = false;
 		// Set Count = 0
-		int count = 0;
+		// int count = 0;
 		// Let OPEN = [v0]; Let CLOSED = []
 		Stack openVe = new Stack();
 		Stack closedVe = new Stack();
 		// Set Pred(v0) = null;
-		pred.clear();
+		pred.clear(); // TODO should we clear, or just let it handle duplicates?
 		pred.put(vi, null);
 		// Add Start vertex to open set
 		openVe.push(vi);
 		// While OPEN is not empty:
-		while ( !openVe.empty() ) {
+		while (!openVe.empty() && !endSearch) {
 			// v = OPEN.removeFirst()
 			currentVe = openVe.pop;
 			// Set Label(v) = count; count += 1
-			count++;
+			// count++;
 			// S = successors(v);
 			// For s in S:
-			for ( Operator move : pegMoves ) {
+			for (Operator move : pegMoves) {
 				// if s in OPEN or s in CLOSED, continue.
 				// else insert s into OPEN at the front.
 				childVe = move.transtion(currentVe);
-				if ( childVe != currentVe && !closedVe.contains(childVe) && !openVe.contains(childVe) ) {
+				if (childVe != currentVe && !closedVe.contains(childVe) && !openVe.contains(childVe)) {
 					openVe.push(childVe);
 					// Set Pred(s) = v.
 					pred.put(childVe, currentVe);
+					// Add to explored graph?
+					Ve.add(childVe);
+					Ee.add(new Edge(currentVe, childVe));
+				}
+				if (childVe == vj) {
+					endSearch = true;
 				}
 			}
 			// Insert v into CLOSED
