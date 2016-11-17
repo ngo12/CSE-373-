@@ -8,7 +8,10 @@ import java.util.Stack;
 import java.util.function.Function;
 
 /**
- * 
+ * TA Questions...
+ * 1. What is count for in the searches?
+ * 2. As we do IDFS/BFS do we add to the graph set? Or only when actually making a move/retrieve/shortest graph?
+ * 3. Pseudocode for IDFS/BFS have param vj, but the pseudocode makes it seem like we traverse entire graph?
  */
 
 /**
@@ -28,16 +31,16 @@ import java.util.function.Function;
 public class ExploredGraph {
 	Set<Vertex> Ve; // collection of explored vertices
 	Set<Edge> Ee;   // collection of explored edges
-	Vertex startVe; // starting point, TODO do we need it?
+	Set<Vertex, Vertex> pred;
 	
 	public ExploredGraph() {
 		Ve = new LinkedHashSet<Vertex>();
 		Ee = new LinkedHashSet<Edge>();
+		pred = new LinkedHashMap<Vertex, Vertex>();
 	}
 
 	public void initialize(v) {
 		// TODO Check for valid # of pegs?
-		startVe = v;
 		Ve.add(v);
 	}
 	
@@ -50,21 +53,38 @@ public class ExploredGraph {
 	}
 
 	public void idfs(Vertex vi, Vertex vj) {
-		// use stack for open set
+		// Set Count = 0
+		int count = 0;
+		// Let OPEN = [v0]; Let CLOSED = []
 		Stack openVe = new Stack();
 		Stack closedVe = new Stack();
+		// Set Pred(v0) = null;
+		pred.clear();
+		pred.put(vi, null);
 		// Add Start vertex to open set
 		openVe.push(vi);
-		// While open set not empty:
-		while !openVe.empty() {
-			// pop node from open set
+		// While OPEN is not empty:
+		while ( !openVe.empty() ) {
+			// v = OPEN.removeFirst()
 			currentVe = openVe.pop;
-			// for each child of v:
-				// check if child visited already
-				// if not, add to open set
-				// add v to closed
+			// Set Label(v) = count; count += 1
+			count++;
+			// S = successors(v);
+			// For s in S:
+			for ( Operator move : pegMoves ) {
+				// if s in OPEN or s in CLOSED, continue.
+				// else insert s into OPEN at the front.
+				childVe = move.transtion(currentVe);
+				if ( childVe != currentVe && !closedVe.contains(childVe) && !openVe.contains(childVe) ) {
+					openVe.push(childVe);
+					// Set Pred(s) = v.
+					pred.put(childVe, currentVe);
+				}
+			}
+			// Insert v into CLOSED
+			closedVe.push(currentVe);
 		}
-	} // Implement this. (Iterative Depth-First Search)
+	}
 	
 	public void bfs(Vertex vi, Vertex vj) {} // Implement this. (Breadth-First Search)
 	public ArrayList<Vertex> retrievePath(Vertex vi) {return null;} // Implement this.
