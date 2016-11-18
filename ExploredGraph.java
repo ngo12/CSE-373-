@@ -13,8 +13,8 @@ import java.util.function.Function;
  * TA Questions...
  * 1. What is count for in the searches?
  * 2. Closed set is just read from and inserted into?
- * 3. Queue for open set in BFS, Stack in IDFS.
- * 4. Why Set instead of already declaring in ExploredGraph constructor.
+ * 3. Queue for open set in BFS, Stack in IDFS?
+ * 4. If we expect search to already be done, why ask for vj in retrievePath?
  */
 
 /**
@@ -112,7 +112,27 @@ public class ExploredGraph {
 	}
 
 	public void bfs(Vertex vi, Vertex vj) {} // Implement this. (Breadth-First Search)
-	public ArrayList<Vertex> retrievePath(Vertex vi) {return null;} // Implement this.
+	
+	public ArrayList<Vertex> retrievePath(Vertex vi) {
+		Stack<Vertex> revPath = new Stack<Vertex>();
+		ArrayList<Vertex> path = new ArrayList<Vertex>();
+		if (pred.contains(vi)) {
+			revPath.push(vi);
+			Vertex currentPred = pred.get(vi);
+			while (currentPred != null) {
+				revPath.push(currentPred);
+				currentPred = pred.get(currentPred);
+			}
+			// Reverse list to get proper order
+			for (int i=0; i < revPath.size(); i++) {
+				path.add(revPath.pop());
+			}
+		} else {
+			throw new IllegalArgumentException(); // vertex not in last searched path
+		}
+		return path;
+	}
+	
 	public ArrayList<Vertex> shortestPath(Vertex vi, Vertex vj) {return null;} // Implement this.
 	public Set<Vertex> getVertices() {return Ve;}
 	public Set<Edge> getEdges() {return Ee;}
