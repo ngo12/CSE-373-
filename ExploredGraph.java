@@ -35,29 +35,34 @@ public class ExploredGraph {
 	Set<Vertex> Ve; // collection of explored vertices
 	Set<Edge> Ee;   // collection of explored edges
 	LinkedHashMap<String, Vertex> pred; // predecessors of explored vertices, i.e. <vertex, vertexPred>
-
 	Set<Operator> pegMoves;
-	Operator peg0to1;
-	Operator peg0to2;
-	Operator peg1to0;
-	Operator peg1to2;
-	Operator peg2to0;
-	Operator peg2to1;
+	int numPegs;
 
 	/**
 	 * Explored graph constructor. Sets up edge/vertex sets and possible moves using Operator class.
+	 * You can specify number of pegs using this constructor
+	 * @param pegs The number of pegs in Tower-Of-Hanoi
 	 */
-	public ExploredGraph() {
+	public ExploredGraph(int pegs) {
 		Ve = new LinkedHashSet<Vertex>();
 		Ee = new LinkedHashSet<Edge>();
 		pred = new LinkedHashMap<String, Vertex>();
 		pegMoves = new LinkedHashSet<Operator>();
-		pegMoves.add(peg0to1 = new Operator(0, 1));
-		pegMoves.add(peg0to2 = new Operator(0, 2));
-		pegMoves.add(peg1to0 = new Operator(1, 0));
-		pegMoves.add(peg1to2 = new Operator(1, 2));
-		pegMoves.add(peg2to0 = new Operator(2, 0));
-		pegMoves.add(peg2to1 = new Operator(2, 1));
+		numPegs = pegs;
+		// Construct possible moves
+		for (int i = 0; i < numPegs; i++) {
+			for (int j = 0; j < numPegs; j++) {
+				if (i != j) { pegMoves.add(new Operator(i, j)); }
+			}
+		}
+	}
+
+	/**
+	 * Explored graph constructor. Sets up edge/vertex sets and possible moves using Operator class.
+	 * Uses the default of 3 pegs.
+	 */
+	public ExploredGraph() {
+		this(3);
 	}
 
 	/**
@@ -183,9 +188,7 @@ public class ExploredGraph {
 		Stack<Vertex> revPath = new Stack<Vertex>();
 		ArrayList<Vertex> path = new ArrayList<Vertex>();
 
-		// TODO how can we check pred contains the key first?
-//		if (pred.containsKey(vi)) {
-		if (true) {
+		if (pred.containsKey(vi.toString())) {
 			// Build the path in reverse order.
 			Vertex currentPred = vi;
 			while (pred.get(currentPred.toString()) != null) {
@@ -240,8 +243,8 @@ public class ExploredGraph {
 		// Constructor that takes a string such as "[[4,3,2,1],[],[]]":
 		public Vertex(String vString) {
 			String[] parts = vString.split("\\],\\[");
-			pegs = new ArrayList<Stack<Integer>>(3);
-			for (int i=0; i<3;i++) {
+			pegs = new ArrayList<Stack<Integer>>(numPegs);
+			for (int i=0; i<numPegs;i++) {
 				pegs.add(new Stack<Integer>());
 				try {
 					parts[i]=parts[i].replaceAll("\\[","");
@@ -262,9 +265,9 @@ public class ExploredGraph {
 		}
 		public String toString() {
 			String ans = "[";
-			for (int i=0; i<3; i++) {
+			for (int i=0; i<numPegs; i++) {
 			    ans += pegs.get(i).toString().replace(" ", "");
-				if (i<2) { ans += ","; }
+				if (i<numPegs-1) { ans += ","; }
 			}
 			ans += "]";
 			return ans;
@@ -365,6 +368,31 @@ public class ExploredGraph {
 
 		}
 	}
+
+//	/**
+//	 * Used for testing purposes
+//	 * @param args
+//	 */
+//	public static void main(String[] args) {
+//		ExploredGraph eg = new ExploredGraph(4);
+//		// Test the vertex constructor:
+//		Vertex v0 = eg.new Vertex("[[5,4,3,2,1],[],[],[]]");
+//		Vertex v1 = eg.new Vertex("[[],[],[],[5,4,3,2,1]]");
+//		System.out.println(v0);
+//		// Add your own tests here.
+//		eg.initialize(v0);
+//		eg.idfs(v0, v1);
+//		ArrayList<Vertex> idfsPath = eg.retrievePath(v1);
+//		Iterator<Vertex> it = idfsPath.iterator();
+//		System.out.println(idfsPath.size());
+//		for (Vertex v : idfsPath) {
+//			System.out.println(v.toString());
+//		}
+//		// The autograder code will be used to test your basic functionality later.
+////		eg.Ve.add(v0); // Adds v0 to the Set of Vertexes in the ExploredGraph
+////		eg.Ve.add(v1); // Adds 1 to the Set of Vertexes in the ExploredGraph
+////		System.out.println(eg.nvertices()); // Size should be equal to 2
+//	}
 
 	/**
 	 * Used for testing purposes
