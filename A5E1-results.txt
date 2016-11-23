@@ -13,6 +13,8 @@ Run 1: Using 3 pegs and 4 disks.
 Vertex v0 = eg.new Vertex("[[4,3,2,1],[],[]]");
 Vertex v1 = eg.new Vertex("[[],[],[4,3,2,1]]");
 
+Output of shortest path:
+
 [[4,3,2,1],[],[]]
 [[4,3,2,1],[],[]]
 [[4,3,2,1],[],[]]
@@ -40,6 +42,8 @@ Run 2: Using 4 pegs and 4 disks.
 Vertex v0 = eg.new Vertex("[[4,3,2,1],[],[],[]]");
 Vertex v1 = eg.new Vertex("[[],[],[],[4,3,2,1]]");
 
+Output of shortest path:
+
 [[4,3,2,1],[],[],[]]
 [[4,3,2,1],[],[],[]]
 [[4,3,2,1],[],[],[]]
@@ -60,6 +64,8 @@ Run 3: Using 4 pegs and 4 disks with a different starting vertex.
 
 Vertex v0 = eg.new Vertex("[[2,1],[4],[],[3]]");
 Vertex v1 = eg.new Vertex("[[],[],[],[4,3,2,1]]");
+
+Output of shortest path:
 
 [[2,1],[4],[],[3]]
 [[2,1],[4],[],[3]]
